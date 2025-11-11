@@ -1,194 +1,311 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>🔍 Pokédex Mini App Pro</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+  <title>Pokédex Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
+
   <style>
     :root {
-      --pokedex-red: #E3350D;
-      --pokedex-dark-red: #8c1f10;
-      --pokedex-blue: #30A7D7;
-      --pokedex-yellow: #F7D02C;
-      --pokedex-light-gray: #F2F2F2;
-      --pokedex-dark-gray: #151515;
-      --pokedex-border: rgba(255,255,255,0.16);
-      --pokedex-glow: 0 18px 60px rgba(0, 0, 0, 0.9);
-      --radius-xl: 28px;
-      --transition-fast: 0.25s ease;
-      --transition-med: 0.35s cubic-bezier(.19,1,.22,1);
+      --red-main: #e02421;
+      --red-dark: #a61619;
+      --border-dark: #3b0406;
+      --screen-bg: #10151f;
+      --screen-inner: #05070d;
+      --accent-blue: #30a7d7;
+      --accent-yellow: #f7d02c;
+      --accent-green: #3bd16f;
+      --text-soft: rgba(255, 255, 255, 0.78);
+      --text-dim: rgba(255, 255, 255, 0.55);
+      --radius: 18px;
+      --transition-fast: 0.2s ease;
+      --transition-med: 0.35s cubic-bezier(.19, 1, .22, 1);
+      --shadow-strong: 0 22px 60px rgba(0, 0, 0, 1);
+      --card-radius: 14px;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--font-main);
       background:
-              radial-gradient(circle at top, rgba(255,255,255,0.04) 0, transparent 55%),
-              radial-gradient(circle at bottom, rgba(48,167,215,0.06) 0, transparent 65%),
-              #050816;
+        radial-gradient(circle at top,
+          rgba(255, 255, 255, 0.04),
+          transparent 55%)
+        ,
+        radial-gradient(circle at bottom,
+          rgba(0, 0, 0, 0.95),
+          #020308);
       color: #fff;
       height: 100vh;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
       padding:
-        calc(env(safe-area-inset-top, 0) + 10px)
-        10px
-        calc(env(safe-area-inset-bottom, 0) + 10px);
+        calc(env(safe-area-inset-top, 0) + 8px)
+        8px
+        calc(env(safe-area-inset-bottom, 0) + 8px);
+      overflow: hidden;
     }
 
-    /* 3B cihaz kabuğu */
-    .pokedex-shell {
+    .pokedex-wrapper {
       width: 100%;
       max-width: 480px;
       height: 100%;
       max-height: 880px;
-      padding: 10px;
-      border-radius: 40px;
-      background:
-        linear-gradient(145deg, rgba(227,53,13,0.08), transparent),
-        radial-gradient(circle at top left, rgba(247,208,44,0.06), transparent),
-        rgba(9,9,11,0.98);
-      box-shadow: var(--pokedex-glow);
-      backdrop-filter: blur(16px);
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      perspective: 1600px;
-    }
-
-    .pokedex-container {
-      flex: 1;
-      border-radius: 32px;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.06), transparent 70%),
-        linear-gradient(180deg, #151515 0%, #050505 100%);
-      border: 1px solid var(--pokedex-border);
-      box-shadow:
-        inset 0 0 40px rgba(255,255,255,0.02),
-        0 24px 60px rgba(0,0,0,0.9);
-      display: flex;
-      flex-direction: column;
-      padding: 10px 10px 8px;
-      transform-style: preserve-3d;
-      transition: transform var(--transition-med), box-shadow var(--transition-med);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pokedex-container::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 55%);
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
-
-    .pokedex-header {
-      position: relative;
-      padding: 6px 4px 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      z-index: 2;
+      justify-content: center;
     }
 
-    .device-orb {
+    .pokedex-device {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, var(--red-main), var(--red-dark));
+      border: 2px solid var(--border-dark);
+      box-shadow:
+        var(--shadow-strong),
+        inset 0 0 16px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transform-style: preserve-3d;
+      transition: transform var(--transition-med),
+        box-shadow var(--transition-med);
+    }
+
+    .pokedex-device:hover {
+      box-shadow:
+        0 26px 70px rgba(0, 0, 0, 1),
+        inset 0 0 20px rgba(0, 0, 0, 0.9);
+    }
+
+    /* HEADER */
+
+    .pokedex-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .lens-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .lens-outer {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 30%, #ffffff, #d7e9ff 40%, #30A7D7 75%, #16213e 100%);
+      border: 3px solid #fff;
+      background: radial-gradient(circle at 30% 30%,
+          #ffffff,
+          #8be3ff,
+          #0064a8);
       box-shadow:
-        0 0 12px rgba(48,167,215,0.9),
-        0 8px 20px rgba(0,0,0,0.7);
-      border: 2px solid rgba(0,0,0,0.7);
+        0 0 10px rgba(255, 255, 255, 0.9),
+        0 6px 10px rgba(0, 0, 0, 0.9);
+      position: relative;
     }
 
-    .header-title-block {
-      flex: 1;
+    .lens-inner {
+      position: absolute;
+      inset: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%,
+          #ffffff,
+          #4bbdf0,
+          #002b4f);
+      opacity: 0.85;
+    }
+
+    .lens-lights {
+      display: flex;
+      gap: 3px;
+    }
+
+    .lens-lights .light {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .light.red {
+      background: #ff4a4a;
+    }
+
+    .light.yellow {
+      background: #ffd93b;
+    }
+
+    .light.green {
+      background: #3bd16f;
+    }
+
+    .title-block {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
 
-    .header-label {
-      font-size: 10px;
-      letter-spacing: 0.16em;
+    .label {
+      font-size: 8px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
+      color: var(--text-dim);
     }
 
-    .header-title {
-      font-size: 22px;
+    .title {
+      font-size: 20px;
       font-weight: 900;
-      letter-spacing: 0.12em;
-      text-shadow: 0 3px 8px rgba(0,0,0,0.8);
+      letter-spacing: 0.18em;
+      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
     }
 
-    .header-sub {
-      font-size: 10px;
-      color: rgba(255,255,255,0.65);
+    .subtitle {
+      font-size: 9px;
+      color: var(--text-soft);
     }
 
-    .total-count {
-      font-size: 11px;
-      padding: 4px 10px;
+    .status-block {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: radial-gradient(circle at top, rgba(255,255,255,0.06), transparent);
+      font-size: 8px;
+      background: #260508;
+      border: 1px solid #5a070a;
+      color: var(--accent-yellow);
       display: inline-flex;
       align-items: center;
       gap: 4px;
       white-space: nowrap;
     }
 
-    .top-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .chip.small {
+      color: var(--accent-blue);
     }
 
-    .chip {
-      padding: 4px 9px;
+    /* DISPLAY (detay ekran) */
+
+    .display-section {
+      flex: 0 0 auto;
+    }
+
+    .display-frame {
+      margin-top: 2px;
+      padding: 4px;
+      border-radius: 14px;
+      background: #6a0509;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+    }
+
+    .display-inner {
+      display: grid;
+      grid-template-columns: 1.4fr 2fr;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 10px;
+      background: var(--screen-bg);
+      border: 1px solid #05070b;
+      box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 1),
+        0 6px 10px rgba(0, 0, 0, 1);
+    }
+
+    .display-sprite {
+      border-radius: 6px;
+      background: radial-gradient(circle at top,
+          #222a3a,
+          var(--screen-inner));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .display-sprite img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 1));
+    }
+
+    .display-placeholder {
+      font-size: 26px;
+      color: var(--accent-blue);
+      opacity: 0.85;
+    }
+
+    .display-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 9px;
+      color: var(--text-soft);
+    }
+
+    .display-id {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #070a11;
+      border: 1px solid #3a9cff;
+      width: fit-content;
+    }
+
+    .display-name {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .display-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+
+    .display-types .type-badge {
+      padding: 2px 6px;
       border-radius: 999px;
-      font-size: 9px;
-      border: 1px solid rgba(255,255,255,0.18);
-      color: rgba(255,255,255,0.75);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(10,10,10,0.9);
+      font-size: 7px;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
     }
 
-    .chip select {
-      background: transparent;
-      border: none;
-      color: inherit;
-      font-size: 9px;
-      outline: none;
+    .display-stats {
+      margin-top: 2px;
+      line-height: 1.3;
     }
 
-    .pokedex-body {
-      flex: 1;
+    /* CONTROLS (search + filter) */
+
+    .controls-section {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-      z-index: 2;
-    }
-
-    .search-container {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 6px 4px 4px;
+      gap: 3px;
+      margin-top: 2px;
     }
 
     .search-wrapper {
@@ -197,51 +314,49 @@
 
     .search-input {
       width: 100%;
-      padding: 10px 34px 10px 30px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.04), transparent),
-        rgba(8,8,8,0.98);
+      padding: 7px 24px 7px 20px;
+      border-radius: 10px;
+      border: 1px solid #4f0609;
+      background: #160408;
       color: #fff;
-      font-size: 13px;
+      font-size: 9px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
       outline: none;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
       transition: all var(--transition-fast);
     }
 
     .search-input::placeholder {
-      color: rgba(255,255,255,0.35);
+      color: var(--text-dim);
     }
 
     .search-input:focus {
-      border-color: var(--pokedex-blue);
+      border-color: var(--accent-blue);
       box-shadow:
-        0 0 0 1px rgba(48,167,215,0.4),
-        0 14px 30px rgba(0,0,0,0.9);
+        0 0 0 1px rgba(48, 167, 215, 0.4),
+        0 6px 12px rgba(0, 0, 0, 1);
     }
 
     .search-icon {
       position: absolute;
-      left: 10px;
+      left: 6px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 13px;
+      font-size: 9px;
       opacity: 0.7;
     }
 
     .clear-search {
       position: absolute;
-      right: 8px;
+      right: 5px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      font-size: 11px;
       border: none;
-      background: rgba(255,255,255,0.12);
-      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+      color: #111;
+      font-size: 9px;
       display: none;
       align-items: center;
       justify-content: center;
@@ -250,92 +365,106 @@
 
     .filters {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       overflow-x: auto;
-      padding-bottom: 2px;
+      padding-bottom: 1px;
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    .filters::-webkit-scrollbar { display: none; }
+
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
 
     .filter-btn {
-      padding: 4px 9px;
-      font-size: 9px;
+      padding: 3px 6px;
+      font-size: 7px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(12,12,12,0.98);
-      color: rgba(255,255,255,0.75);
+      border: 1px solid #4f0609;
+      background: #1a0508;
+      color: var(--text-dim);
       white-space: nowrap;
       cursor: pointer;
       transition: all var(--transition-fast);
     }
 
     .filter-btn.active {
-      background: linear-gradient(135deg, var(--pokedex-blue), #1E7FA8);
+      background: linear-gradient(135deg, var(--accent-blue), #1e7fa8);
       color: #fff;
       border-color: transparent;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.8);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 1);
     }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip select {
+      background: transparent;
+      border: none;
+      color: var(--accent-yellow);
+      font-size: 8px;
+      outline: none;
+    }
+
+    /* TABS */
 
     .tabs {
       display: flex;
-      gap: 6px;
-      padding: 2px 2px 0;
-      border-radius: 14px;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.03), transparent);
+      gap: 4px;
+      margin-top: 2px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 5px 0;
-      border-radius: 11px;
-      border: none;
-      font-size: 10px;
-      color: rgba(255,255,255,0.65);
-      background: transparent;
+      padding: 4px 0;
+      font-size: 8px;
+      border-radius: 8px;
+      border: 1px solid #4f0609;
+      background: #1a0508;
+      color: var(--text-dim);
       cursor: pointer;
       transition: all var(--transition-fast);
     }
 
     .tab-btn.active {
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.18), transparent),
-        linear-gradient(180deg, rgba(48,167,215,0.22), rgba(0,0,0,0.9));
-      color: #fff;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.9);
+      background: #0b0b0f;
+      color: var(--accent-yellow);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 1);
     }
 
-    .pokemon-list-container {
+    /* LIST */
+
+    .list-section {
       flex: 1;
-      margin-top: 2px;
-      border-radius: 20px;
-      padding: 5px 3px 5px;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.02), transparent),
-        rgba(4,4,4,0.98);
-      box-shadow: inset 0 0 22px rgba(0,0,0,0.9);
-      position: relative;
-      overflow: hidden;
+      margin-top: 1px;
+      padding: 4px;
+      border-radius: 14px;
+      background: #1a0508;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 1);
     }
 
     .pokemon-list {
       height: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding-right: 3px;
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 4px;
+      padding-right: 2px;
+      font-size: 9px;
       scrollbar-width: thin;
-      scrollbar-color: var(--pokedex-blue) transparent;
-      font-size: 13px;
+      scrollbar-color: #6b0b0e transparent;
     }
 
     .pokemon-list::-webkit-scrollbar {
       width: 3px;
     }
+
     .pokemon-list::-webkit-scrollbar-thumb {
-      background: var(--pokedex-blue);
+      background: #6b0b0e;
       border-radius: 999px;
     }
 
@@ -343,467 +472,315 @@
       position: relative;
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 9px 9px 9px 7px;
-      border-radius: 16px;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent),
-        linear-gradient(135deg, #141414, #121212);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow:
-        0 8px 18px rgba(0,0,0,0.85),
-        inset 0 0 14px rgba(255,255,255,0.02);
+      gap: 5px;
+      padding: 5px 6px;
+      border-radius: var(--card-radius);
+      background: linear-gradient(135deg, #200408, #36060a);
+      border: 1px solid #4f0609;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 1);
       cursor: pointer;
-      transform-origin: center;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
-      overflow: hidden;
+      transition: all var(--transition-fast);
     }
 
-    .pokemon-card::after {
-      content: "";
-      position: absolute;
-      inset: -20%;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.05), transparent 65%);
-      opacity: 0;
-      mix-blend-mode: screen;
-      transition: opacity var(--transition-fast);
-      pointer-events: none;
+    .pokemon-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 1);
+      border-color: var(--accent-blue);
     }
-
-    .pokemon-card:hover,
-    .pokemon-card:active {
-      transform: translateY(-2px) scale(1.01);
-      box-shadow: 0 14px 28px rgba(0,0,0,0.95);
-      border-color: rgba(48,167,215,0.42);
-    }
-
-    .pokemon-card:hover::after { opacity: 1; }
 
     .sprite-wrap {
-      position: relative;
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      background:
-        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.2), transparent),
-        rgba(10,10,10,1);
-      border: 1px solid rgba(255,255,255,0.12);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: #08090d;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow:
-        0 8px 16px rgba(0,0,0,0.95),
-        inset 0 0 10px rgba(0,0,0,0.9);
-      overflow: hidden;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
     }
 
     .sprite-wrap img {
-      width: 54px;
-      height: 54px;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9));
-      transition: transform var(--transition-fast);
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 1));
     }
 
-    .pokemon-card:hover .sprite-wrap img {
-      transform: translateY(-3px) scale(1.06);
-    }
-
-    .shiny-badge {
-      position: absolute;
-      top: 3px;
-      right: 3px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffd700, #ffaa00);
-      border: 1px solid #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: bold;
-      animation: sparkle 1.6s infinite;
-      box-shadow: 0 0 7px rgba(0,0,0,0.9);
-    }
-
-    @keyframes sparkle {
-      0%,100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.25) rotate(18deg); }
-    }
-
-    .favorite-toggle {
-      position: absolute;
-      top: 5px;
-      left: 6px;
-      width: 16px;
-      height: 16px;
-      border-radius: 6px;
-      background: rgba(0,0,0,0.75);
-      border: 1px solid rgba(255,255,255,0.26);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: rgba(255,255,255,0.55);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      backdrop-filter: blur(4px);
-      z-index: 3;
-    }
-
-    .favorite-toggle.active {
-      background: radial-gradient(circle, #ffd700, #ff9d00);
-      color: #000;
-      border-color: #000;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.9);
-      transform: translateY(-1px);
-    }
-
-    .pokemon-info {
-      flex: 1;
+    .info-block {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
 
     .info-top {
       display: flex;
       align-items: baseline;
-      gap: 6px;
-      flex-wrap: wrap;
+      gap: 4px;
     }
 
     .pokemon-id {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.86);
-      border: 1px solid rgba(255,255,255,0.22);
-      color: rgba(255,255,255,0.8);
+      padding: 1px 4px;
+      font-size: 7px;
+      border-radius: 8px;
+      background: #06070b;
+      border: 1px solid #5a070a;
     }
 
     .pokemon-name {
-      font-size: 14px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.02em;
       text-transform: capitalize;
     }
 
     .quick-stats {
-      display: flex;
-      gap: 8px;
-      font-size: 9px;
-      color: rgba(255,255,255,0.55);
+      font-size: 7px;
+      color: var(--text-dim);
     }
 
     .pokemon-types {
       display: flex;
+      gap: 2px;
       flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 2px;
     }
 
-    .type-badge {
-      padding: 3px 7px;
+    .pokemon-types .type-badge {
+      padding: 1px 4px;
+      font-size: 6px;
       border-radius: 999px;
-      font-size: 8px;
-      font-weight: 600;
-      text-transform: uppercase;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.8);
       color: #fff;
+    }
+
+    .favorite-toggle {
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      width: 13px;
+      height: 13px;
+      border-radius: 4px;
+      background: #150307;
+      border: 1px solid #5a070a;
+      color: var(--text-dim);
+      font-size: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .favorite-toggle.active {
+      background: #ffd700;
+      color: #111;
+      border-color: #111;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 1);
     }
 
     .loading,
     .no-results {
       text-align: center;
-      padding: 26px 10px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.65);
+      padding: 18px 6px;
+      font-size: 9px;
+      color: var(--text-soft);
     }
 
     .loading-spinner {
-      width: 26px;
-      height: 26px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.12);
-      border-top-color: var(--pokedex-blue);
-      margin: 0 auto 10px;
+      border: 3px solid rgba(255, 255, 255, 0.16);
+      border-top-color: var(--accent-blue);
+      margin: 0 auto 6px;
       animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
-    /* Modal (detay ekranı) */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.25s ease;
-      backdrop-filter: blur(14px);
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      width: min(420px, 92vw);
-      max-height: 90vh;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.08), transparent),
-        #050505;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.22);
-      box-shadow: 0 22px 55px rgba(0,0,0,0.98);
-      overflow: hidden;
-      transform: translateY(20px) scale(0.9);
-      transition: all 0.28s cubic-bezier(.19,1,.22,1);
-      position: relative;
-    }
-
-    .modal-overlay.active .modal {
-      transform: translateY(0) scale(1);
-    }
-
-    .modal-header {
-      padding: 20px 18px 12px;
-      text-align: center;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.12), transparent),
-        linear-gradient(180deg, var(--pokedex-red), var(--pokedex-dark-red));
-      position: relative;
-    }
-
-    .modal-sprite {
-      width: 132px;
-      height: 132px;
-      border-radius: 50%;
-      margin: 0 auto 4px;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.16), transparent),
-        rgba(0,0,0,0.92);
-      border: 3px solid rgba(255,255,255,0.96);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        0 12px 26px rgba(0,0,0,1),
-        0 0 25px rgba(0,0,0,1);
-    }
-
-    .modal-sprite img {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      filter: drop-shadow(0 6px 16px rgba(0,0,0,1));
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.9);
-      background: rgba(0,0,0,0.45);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.95);
-    }
-
-    .close-btn:hover {
-      background: rgba(0,0,0,0.9);
-      transform: translateY(-1px);
-    }
-
-    .modal-body {
-      padding: 14px 16px 14px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.88);
-      overflow-y: auto;
-      max-height: calc(90vh - 180px);
-    }
-
-    .modal-name {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      align-items: baseline;
-      margin-bottom: 6px;
-      color: #fff;
-    }
-
-    .modal-name .pokemon-id {
-      font-size: 11px;
-    }
-
-    .modal-name span.name {
-      font-size: 19px;
-      font-weight: 800;
-      text-transform: capitalize;
-      letter-spacing: 0.04em;
-    }
-
-    .modal-types {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .stat-item {
-      padding: 7px;
-      border-radius: 10px;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.03), transparent);
-      border: 1px solid rgba(255,255,255,0.16);
-      text-align: center;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.95);
-    }
-
-    .stat-value {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--pokedex-blue);
-    }
-
-    .stat-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-    }
-
-    .type-weakness {
-      margin-top: 4px;
-      padding: 8px;
-      border-radius: 12px;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.03), transparent);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .type-weakness h4 {
-      font-size: 10px;
-      margin-bottom: 6px;
-      text-align: center;
-      color: rgba(255,255,255,0.8);
-    }
-
-    .type-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(60px,1fr));
-      gap: 4px;
-    }
-
-    .modal-fav {
-      display: flex;
-      justify-content: center;
-      margin-top: 6px;
-      gap: 6px;
-      align-items: center;
-      font-size: 11px;
-      color: rgba(255,255,255,0.75);
-    }
-
-    .modal-fav button {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 10px;
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-      background: radial-gradient(circle, #ffd700, #ff9d00);
-      color: #000;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.95);
-    }
+    /* FOOTER */
 
     .pokedex-footer {
-      padding-top: 4px;
+      margin-top: 2px;
       display: flex;
-      justify-content: center;
-      gap: 8px;
       align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .dpad {
+      position: relative;
+      width: 26px;
+      height: 26px;
+    }
+
+    .dpad .btn {
+      position: absolute;
+      background: #0b0b0f;
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+    }
+
+    .dpad .center {
+      width: 8px;
+      height: 8px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .dpad .up {
+      width: 7px;
+      height: 7px;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .dpad .down {
+      width: 7px;
+      height: 7px;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .dpad .left {
+      width: 7px;
+      height: 7px;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .dpad .right {
+      width: 7px;
+      height: 7px;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .ab-btn {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #0b0b0f;
+      color: #eee;
+      font-size: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+    }
+
+    .controls-right {
+      display: flex;
+      gap: 4px;
     }
 
     .random-btn {
       flex: 1;
-      max-width: 220px;
-      padding: 8px 14px;
+      padding: 6px 10px;
       border-radius: 999px;
       border: none;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.14), transparent),
-        linear-gradient(135deg, var(--pokedex-blue), #1E7FA8);
+      background: linear-gradient(135deg,
+          var(--accent-blue),
+          #1b6b8f);
       color: #fff;
-      font-size: 12px;
+      font-size: 9px;
       font-weight: 600;
       display: inline-flex;
-      gap: 6px;
       align-items: center;
       justify-content: center;
+      gap: 4px;
       cursor: pointer;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.95);
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 1);
       transition: all var(--transition-fast);
     }
 
-    .random-btn span.icon { font-size: 15px; }
-
     .random-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 30px rgba(0,0,0,1);
-    }
-
-    .random-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0, 0, 0, 1);
     }
 
     @media (max-width: 480px) {
-      .pokedex-shell { max-height: none; }
-      .pokedex-container { border-radius: 26px; }
-      .header-title { font-size: 20px; }
+      .pokedex-device {
+        border-radius: 24px;
+      }
+
+      .title {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
-<div class="pokedex-shell">
-  <div class="pokedex-container" id="pokedexShell">
+<div class="pokedex-wrapper">
+  <div class="pokedex-device">
+    <!-- HEADER -->
     <header class="pokedex-header">
-      <div class="device-orb"></div>
-      <div class="header-title-block">
-        <div class="header-label">POKÉMON INDEX v2.0</div>
-        <div class="header-title">POKÉDEX</div>
-        <div class="header-sub">Telegram Mini · Touch Optimized · 3D UI</div>
-      </div>
-      <div class="top-controls">
-        <div class="total-count" id="totalCount">
-          ⏳ Yükleniyor...
+      <div class="lens-block">
+        <div class="lens-outer">
+          <div class="lens-inner"></div>
         </div>
+        <div class="lens-lights">
+          <span class="light red"></span>
+          <span class="light yellow"></span>
+          <span class="light green"></span>
+        </div>
+      </div>
+      <div class="title-block">
+        <div class="label">KANTO TECH · POKÉ-TERMINAL</div>
+        <div class="title">POKÉDEX</div>
+        <div class="subtitle">Telegram Mini · Dokunmatik Arayüz</div>
+      </div>
+      <div class="status-block">
+        <div class="chip" id="totalCount">Yükleniyor...</div>
+      </div>
+    </header>
+
+    <!-- DISPLAY -->
+    <section class="display-section">
+      <div class="display-frame">
+        <div class="display-inner">
+          <div class="display-sprite" id="detailSprite">
+            <span class="display-placeholder">◓</span>
+          </div>
+          <div class="display-info">
+            <div class="display-id" id="detailId">#---</div>
+            <div class="display-name" id="detailName">Bir Pokémon seç</div>
+            <div class="display-types" id="detailTypes"></div>
+            <div class="display-stats" id="detailStats">
+              Aşağıdaki listeden bir Pokémon'a dokunarak detayları gör.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH + FILTERS -->
+    <section class="controls-section">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          id="searchInput"
+          class="search-input"
+          type="text"
+          placeholder="İsim veya #ID ara (örn: pikachu, 025)"
+        />
+        <button id="clearSearch" class="clear-search">×</button>
+      </div>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all">Tümü</button>
+        <button class="filter-btn" data-filter="generation-1">Gen 1</button>
+        <button class="filter-btn" data-filter="generation-2">Gen 2</button>
+        <button class="filter-btn" data-filter="generation-3">Gen 3</button>
+        <button class="filter-btn" data-filter="legendary">Efsanevi</button>
+        <button class="filter-btn" data-filter="starter">Starter</button>
+      </div>
+      <div class="controls-row">
         <div class="chip">
           Sırala:
           <select id="sortSelect">
@@ -812,284 +789,59 @@
             <option value="name-asc">Ada göre</option>
           </select>
         </div>
+        <div class="chip small">RUN</div>
       </div>
-    </header>
+    </section>
 
-    <main class="pokedex-body">
-      <div class="search-container">
-        <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input id="searchInput" class="search-input" type="text"
-                 placeholder="İsim veya #ID ile ara (örn: pikachu, 025)">
-          <button id="clearSearch" class="clear-search">×</button>
-        </div>
-        <div class="filters" id="filters">
-          <button class="filter-btn active" data-filter="all">Tümü</button>
-          <button class="filter-btn" data-filter="generation-1">Gen 1</button>
-          <button class="filter-btn" data-filter="generation-2">Gen 2</button>
-          <button class="filter-btn" data-filter="generation-3">Gen 3</button>
-          <button class="filter-btn" data-filter="legendary">Efsanevi</button>
-          <button class="filter-btn" data-filter="starter">Starter</button>
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="dex">DEX</button>
+      <button class="tab-btn" data-tab="favorites">★ FAVORİLER</button>
+    </div>
+
+    <!-- LIST -->
+    <section class="list-section">
+      <div class="pokemon-list" id="pokemonList">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          Pokémon'lar yükleniyor...
         </div>
       </div>
+    </section>
 
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="dex">Dex</button>
-        <button class="tab-btn" data-tab="favorites">Favoriler</button>
-      </div>
-
-      <section class="pokemon-list-container">
-        <div class="pokemon-list" id="pokemonList">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            Pokémon'lar yükleniyor...
-          </div>
-        </div>
-      </section>
-    </main>
-
+    <!-- FOOTER -->
     <footer class="pokedex-footer">
+      <div class="controls-left">
+        <div class="dpad">
+          <span class="btn up"></span>
+          <span class="btn left"></span>
+          <span class="btn center"></span>
+          <span class="btn right"></span>
+          <span class="btn down"></span>
+        </div>
+      </div>
       <button class="random-btn" id="randomBtn">
-        <span class="icon">🎲</span>
-        <span>Rastgele Pokémon</span>
+        🎲 Rastgele Pokémon
       </button>
+      <div class="controls-right">
+        <div class="ab-btn a">A</div>
+        <div class="ab-btn b">B</div>
+      </div>
     </footer>
   </div>
 </div>
 
-<!-- Detay Modal -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <button class="close-btn" id="closeModal">×</button>
-      <div class="modal-sprite" id="modalSprite"></div>
-    </div>
-    <div class="modal-body">
-      <div class="modal-name" id="modalName"></div>
-      <div class="modal-types" id="modalTypes"></div>
-      <div class="stats-grid" id="modalStats"></div>
-      <div class="type-weakness">
-        <h4>Zayıf Olduğu Türler</h4>
-        <div class="type-grid" id="modalWeaknesses"></div>
-      </div>
-      <div class="modal-fav">
-        <span>Bu Pokémon'u kaydet:</span>
-        <button id="modalFavBtn">★ Favorilere Ekle</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-  // Telegram WebApp
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-  if (tg) {
-    tg.ready();
-    tg.expand();
-    try { tg.enableVerticalSwipes(); } catch(e){}
-  }
-
-  // 3D tilt efekti
-  const shellEl = document.getElementById('pokedexShell');
-  let tiltEnabled = true;
-  shellEl.addEventListener('pointermove', (e) => {
-    if (!tiltEnabled) return;
-    const rect = shellEl.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    const rotateX = y * -6;
-    const rotateY = x * 6;
-    shellEl.style.transform =
-      `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`;
-  });
-  shellEl.addEventListener('pointerleave', () => {
-    shellEl.style.transform = 'rotateX(0) rotateY(0) translateZ(0)';
-  });
-
-  // Global state
+  // --- API yardımcıları ---
   const POKEMON_API = 'https://pokeapi.co/api/v2';
-  let allPokemon = [];
-  let filteredPokemon = [];
-  let currentTab = 'dex';
-  let pokemonCache = {};
-  let legendarySet = null;
-  let startersSet = new Set([
-    'bulbasaur','ivysaur','venusaur',
-    'charmander','charmeleon','charizard',
-    'squirtle','wartortle','blastoise',
-    'chikorita','bayleef','meganium',
-    'cyndaquil','quilava','typhlosion',
-    'totodile','croconaw','feraligatr'
-  ]);
-  let favorites = new Set(
-    JSON.parse(localStorage.getItem('pokedex_favorites') || '[]')
-  );
+  const pokemonCache = {};
 
-  const listEl = document.getElementById('pokemonList');
-  const totalCountEl = document.getElementById('totalCount');
-  const searchInput = document.getElementById('searchInput');
-  const clearSearchBtn = document.getElementById('clearSearch');
-  const filtersEl = document.getElementById('filters');
-  const sortSelect = document.getElementById('sortSelect');
-  const tabs = document.querySelectorAll('.tab-btn');
-  const randomBtn = document.getElementById('randomBtn');
-
-  // Infinite scroll
-  const CHUNK_SIZE = 40;
-  let currentRendered = 0;
-  let isAppending = false;
-
-  // Modal refs
-  const modalOverlay = document.getElementById('modalOverlay');
-  const closeModalBtn = document.getElementById('closeModal');
-  const modalSprite = document.getElementById('modalSprite');
-  const modalName = document.getElementById('modalName');
-  const modalTypes = document.getElementById('modalTypes');
-  const modalStats = document.getElementById('modalStats');
-  const modalWeaknesses = document.getElementById('modalWeaknesses');
-  const modalFavBtn = document.getElementById('modalFavBtn');
-  let currentModalId = null;
-
-  // Başlatıcı
-  loadAllPokemon();
-
-  async function loadAllPokemon() {
-    try {
-      const res = await fetch(`${POKEMON_API}/pokemon?limit=1328`);
-      const data = await res.json();
-      allPokemon = data.results;
-      totalCountEl.textContent = `Toplam ${data.count} Pokémon`;
-      filteredPokemon = [...allPokemon];
-      sortCurrent();
-      renderList(filteredPokemon, true);
-      if (tg) tg.HapticFeedback.impactOccurred('medium');
-    } catch (e) {
-      console.error(e);
-      listEl.innerHTML = `<div class="no-results">Yüklenemedi! Yeniden dene.</div>`;
-    }
-  }
-
-  function getIdFromUrl(url) {
-    const parts = url.split('/').filter(Boolean);
-    return parts[parts.length - 1];
-  }
-
-  function isFavorite(id) {
-    return favorites.has(String(id));
-  }
-
-  function saveFavorites() {
-    localStorage.setItem('pokedex_favorites', JSON.stringify([...favorites]));
-  }
-
-  function toggleFavorite(id, event) {
-    if (event) event.stopPropagation();
-    const key = String(id);
-    if (favorites.has(key)) {
-      favorites.delete(key);
-      if (tg) tg.HapticFeedback.impactOccurred('light');
-    } else {
-      favorites.add(key);
-      if (tg) tg.HapticFeedback.notificationOccurred('success');
-    }
-    saveFavorites();
-    updateFavoriteIcons();
-    if (currentTab === 'favorites') {
-      applyFilters(); // sekmedeyken listeyi güncelle
-    }
-  }
-
-  function updateFavoriteIcons() {
-    document.querySelectorAll('.pokemon-card').forEach(card => {
-      const id = card.getAttribute('data-id');
-      const fav = card.querySelector('.favorite-toggle');
-      if (!fav || !id) return;
-      if (isFavorite(id)) {
-        fav.classList.add('active');
-        fav.textContent = '★';
-      } else {
-        fav.classList.remove('active');
-        fav.textContent = '☆';
-      }
-    });
-  }
-
-  function buildCardElement(p) {
-    const id = getIdFromUrl(p.url);
-    const card = document.createElement('div');
-    card.className = 'pokemon-card';
-    card.setAttribute('data-id', id);
-    card.onclick = () => showPokemonDetail(p.name);
-
-    card.innerHTML = `
-      <div class="favorite-toggle ${isFavorite(id) ? 'active' : ''}" onclick="toggleFavorite('${id}', event)">
-        ${isFavorite(id) ? '★' : '☆'}
-      </div>
-      <div class="sprite-wrap">
-        <img
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png"
-          onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png'"
-          alt="${p.name}">
-        <div class="shiny-badge">★</div>
-      </div>
-      <div class="pokemon-info">
-        <div class="info-top">
-          <div class="pokemon-id">#${id.toString().padStart(3,'0')}</div>
-          <div class="pokemon-name">${capitalize(p.name)}</div>
-        </div>
-        <div class="quick-stats" id="quick-${id}">
-          Yükleniyor...
-        </div>
-        <div class="pokemon-types" id="types-${id}"></div>
-      </div>
-    `;
-    // detayları doldur (tip + min stat)
-    loadPokemonTypesAndMiniStats(p.name, id);
-    return card;
-  }
-
-  function renderList(pokemons, reset = true) {
-    if (reset) {
-      listEl.innerHTML = '';
-      currentRendered = 0;
-    }
-    if (!pokemons.length) {
-      listEl.innerHTML = `<div class="no-results">Sonuç bulunamadı. 😔</div>`;
-      return;
-    }
-    appendChunk(pokemons);
-  }
-
-  function appendChunk(pokemons) {
-    if (isAppending) return;
-    if (currentRendered >= pokemons.length) return;
-    isAppending = true;
-
-    const fragment = document.createDocumentFragment();
-    const slice = pokemons.slice(currentRendered, currentRendered + CHUNK_SIZE);
-
-    slice.forEach(p => {
-      const card = buildCardElement(p);
-      fragment.appendChild(card);
-    });
-
-    listEl.appendChild(fragment);
-    currentRendered += slice.length;
-    isAppending = false;
-  }
-
-  listEl.addEventListener('scroll', () => {
-    if (listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 160) {
-      appendChunk(filteredPokemon);
-    }
-  });
-
-  // Pokémon detay cache
   async function fetchPokemon(nameOrId) {
     const key = String(nameOrId).toLowerCase();
     if (pokemonCache[key]) return pokemonCache[key];
+
     try {
-      const res = await fetch(`${POKEMON_API}/pokemon/${key}`);
+      const res = await fetch(\`\${POKEMON_API}/pokemon/\${key}\`);
       if (!res.ok) return null;
       const data = await res.json();
       pokemonCache[data.name] = data;
@@ -1097,247 +849,13 @@
       return data;
     } catch (e) {
       console.error('fetchPokemon error', e);
-      if (tg) tg.showAlert && tg.showAlert('Pokémon yüklenemedi!');
       return null;
     }
   }
 
-  async function loadPokemonTypesAndMiniStats(name, id) {
-    const pokemon = await fetchPokemon(name);
-    const typesEl = document.getElementById(`types-${id}`);
-    const quickEl = document.getElementById(`quick-${id}`);
-    if (!pokemon) {
-      if (quickEl) quickEl.textContent = '';
-      return;
-    }
-
-    if (pokemon.types && typesEl) {
-      typesEl.innerHTML = pokemon.types.map(t =>
-        `<span class="type-badge" style="background:hsl(${getTypeColor(t.type.name)},70%,45%);">
-          ${capitalize(t.type.name)}
-        </span>`
-      ).join('');
-    }
-
-    if (quickEl && pokemon.stats) {
-      const hp = pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat ?? '?';
-      const spd = pokemon.stats.find(s => s.stat.name === 'speed')?.base_stat ?? '?';
-      quickEl.innerHTML = `HP ${hp} · Hız ${spd}`;
-    }
-  }
-
-  // Detay modal
-  async function showPokemonDetail(name) {
-    if (tg) tg.HapticFeedback.impactOccurred('light');
-    const pokemon = await fetchPokemon(name);
-    if (!pokemon) return;
-
-    currentModalId = pokemon.id;
-
-    modalSprite.innerHTML = `
-      <img src="${
-        pokemon.sprites.other?.['official-artwork']?.front_default ||
-        pokemon.sprites.other?.home?.front_default ||
-        pokemon.sprites.front_default ||
-        ''
-      }" alt="${name}">
-    `;
-
-    modalName.innerHTML = `
-      <span class="pokemon-id">#${String(pokemon.id).padStart(3,'0')}</span>
-      <span class="name">${capitalize(name)}</span>
-    `;
-
-    modalTypes.innerHTML = pokemon.types.map(t =>
-      `<span class="type-badge" style="background:hsl(${getTypeColor(t.type.name)},70%,45%);">
-        ${capitalize(t.type.name)}
-      </span>`
-    ).join('');
-
-    modalStats.innerHTML = pokemon.stats.map(stat => `
-      <div class="stat-item">
-        <div class="stat-value">${stat.base_stat}</div>
-        <div class="stat-label">${getStatName(stat.stat.name)}</div>
-      </div>
-    `).join('');
-
-    const weaknesses = calculateWeaknesses(pokemon.types.map(t => t.type.name));
-    modalWeaknesses.innerHTML = weaknesses.length
-      ? weaknesses.map(w =>
-        `<div class="type-badge" style="background:hsl(${getTypeColor(w)},55%,40%);">
-          ${capitalize(w)}
-        </div>`
-      ).join('')
-      : '<div style="font-size:10px; text-align:center;">Belirgin bir zayıflık yok.</div>';
-
-    updateModalFavBtn();
-    modalOverlay.classList.add('active');
-    if (tg) tg.HapticFeedback.notificationOccurred('success');
-  }
-
-  function closeModal() {
-    modalOverlay.classList.remove('active');
-    currentModalId = null;
-  }
-
-  closeModalBtn.onclick = closeModal;
-  modalOverlay.onclick = (e) => {
-    if (e.target === modalOverlay) closeModal();
-  };
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  function updateModalFavBtn() {
-    if (!currentModalId) return;
-    const isFav = isFavorite(currentModalId);
-    modalFavBtn.textContent = isFav ? '★ Favorilerden Çıkar' : '★ Favorilere Ekle';
-  }
-
-  modalFavBtn.onclick = () => {
-    if (!currentModalId) return;
-    toggleFavorite(currentModalId);
-    updateModalFavBtn();
-  };
-
-  // Arama
-  searchInput.addEventListener('input', debounce(() => {
-    const v = searchInput.value.trim().toLowerCase();
-    clearSearchBtn.style.display = v ? 'flex' : 'none';
-    applyFilters();
-  }, 260));
-
-  clearSearchBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    clearSearchBtn.style.display = 'none';
-    applyFilters();
-  });
-
-  // Filtreler
-  filtersEl.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilters();
-  });
-
-  sortSelect.addEventListener('change', () => {
-    sortCurrent();
-    renderList(filteredPokemon, true);
-  });
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentTab = tab.dataset.tab;
-      applyFilters();
-    });
-  });
-
-  // Rastgele
-  randomBtn.onclick = () => {
-    if (!allPokemon.length) return;
-    const pool = currentTab === 'favorites'
-      ? allPokemon.filter(p => favorites.has(getIdFromUrl(p.url)))
-      : allPokemon;
-    if (!pool.length) return;
-    const random = pool[Math.floor(Math.random() * pool.length)];
-    showPokemonDetail(random.name);
-  };
-
-  // Filtre / sekme / arama kombinasyonu
-  async function applyFilters() {
-    let list = [...allPokemon];
-
-    // sekme: favoriler
-    if (currentTab === 'favorites') {
-      list = list.filter(p => favorites.has(getIdFromUrl(p.url)));
-    }
-
-    // üst filtre butonları
-    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-
-    if (activeFilter.startsWith('generation-')) {
-      const ranges = {
-        'generation-1': [1,151],
-        'generation-2': [152,251],
-        'generation-3': [252,386]
-      };
-      const [min, max] = ranges[activeFilter] || [1, 1328];
-      list = list.filter(p => {
-        const id = Number(getIdFromUrl(p.url));
-        return id >= min && id <= max;
-      });
-    } else if (activeFilter === 'legendary') {
-      if (!legendarySet) {
-        // Efsanevi türler için species endpoint (ağır ama üst düzey :)
-        try {
-          const res = await fetch(`${POKEMON_API}/pokemon-species?limit=2000`);
-          const data = await res.json();
-          legendarySet = new Set(
-            data.results
-              .map(s => s.url)
-          );
-          // İkinci fetch: flag çekmek için
-          const detailed = await Promise.all(
-            data.results.map(r => fetch(r.url).then(x => x.json()).catch(()=>null))
-          );
-          legendarySet = new Set(
-            detailed.filter(s => s && (s.is_legendary || s.is_mythical)).map(s => s.name)
-          );
-        } catch (e) {
-          console.error('Legendary fetch error', e);
-          legendarySet = new Set();
-        }
-      }
-      list = list.filter(p => legendarySet.has(p.name));
-    } else if (activeFilter === 'starter') {
-      list = list.filter(p => startersSet.has(p.name));
-    }
-
-    // arama
-    const q = searchInput.value.trim().toLowerCase();
-    if (q) {
-      list = list.filter(p => {
-        const name = p.name.toLowerCase();
-        const id = getIdFromUrl(p.url);
-        return name.includes(q) || id.startsWith(q.replace('#',''));
-      });
-    }
-
-    filteredPokemon = list;
-    sortCurrent();
-    renderList(filteredPokemon, true);
-  }
-
-  function sortCurrent() {
-    const val = sortSelect.value;
-    filteredPokemon.sort((a,b) => {
-      const idA = Number(getIdFromUrl(a.url));
-      const idB = Number(getIdFromUrl(b.url));
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      if (val === 'id-asc') return idA - idB;
-      if (val === 'id-desc') return idB - idA;
-      if (val === 'name-asc') return nameA.localeCompare(nameB);
-      return idA - idB;
-    });
-  }
-
-  // Helpers
-  function capitalize(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  function debounce(fn, ms) {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(...args), ms);
-    };
+  function getIdFromUrl(url) {
+    const parts = url.split('/').filter(Boolean);
+    return parts[parts.length - 1];
   }
 
   function getTypeColor(type) {
@@ -1363,7 +881,6 @@
   }
 
   function calculateWeaknesses(types) {
-    // Basit örnek tablo (tam type chart değil ama hızlı)
     const table = {
       fire: ['water','rock','ground'],
       water: ['electric','grass'],
@@ -1384,14 +901,464 @@
       poison: ['ground','psychic']
     };
     const weak = new Set();
-    types.forEach(t => {
-      (table[t] || []).forEach(w => weak.add(w));
-    });
+    types.forEach(t => (table[t] || []).forEach(w => weak.add(w)));
     return [...weak];
   }
 
-  // global erişim için (inline onclick)
-  window.toggleFavorite = toggleFavorite;
+  // --- MAIN ---
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const tg = window.Telegram && window.Telegram.WebApp
+      ? window.Telegram.WebApp
+      : null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try { tg.enableVerticalSwipes(); } catch (e) {}
+    }
+
+    const device = document.querySelector('.pokedex-device');
+    const totalCountEl = document.getElementById('totalCount');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearch');
+    const filtersEl = document.getElementById('filters');
+    const sortSelect = document.getElementById('sortSelect');
+    const tabs = document.querySelectorAll('.tab-btn');
+    const listEl = document.getElementById('pokemonList');
+    const randomBtn = document.getElementById('randomBtn');
+
+    const detailSprite = document.getElementById('detailSprite');
+    const detailId = document.getElementById('detailId');
+    const detailName = document.getElementById('detailName');
+    const detailTypes = document.getElementById('detailTypes');
+    const detailStats = document.getElementById('detailStats');
+
+    // hafif 3D
+    device.addEventListener('pointermove', (e) => {
+      const rect = device.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      const rx = y * -3;
+      const ry = x * 3;
+      device.style.transform = \`rotateX(\${rx}deg) rotateY(\${ry}deg)\`;
+    });
+    device.addEventListener('pointerleave', () => {
+      device.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+
+    // state
+    let allPokemon = [];
+    let filteredPokemon = [];
+    let currentTab = 'dex';
+    let favorites = new Set(
+      JSON.parse(localStorage.getItem('pokedex_favorites') || '[]')
+    );
+    let legendarySet = null;
+    const startersSet = new Set([
+      'bulbasaur','ivysaur','venusaur',
+      'charmander','charmeleon','charizard',
+      'squirtle','wartortle','blastoise',
+      'chikorita','bayleef','meganium',
+      'cyndaquil','quilava','typhlosion',
+      'totodile','croconaw','feraligatr'
+    ]);
+
+    const CHUNK_SIZE = 40;
+    let currentRendered = 0;
+    let isAppending = false;
+
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function isFavorite(id) {
+      return favorites.has(String(id));
+    }
+
+    function saveFavorites() {
+      localStorage.setItem(
+        'pokedex_favorites',
+        JSON.stringify([...favorites])
+      );
+    }
+
+    function toggleFavorite(id, event) {
+      if (event) event.stopPropagation();
+      const key = String(id);
+      if (favorites.has(key)) {
+        favorites.delete(key);
+        if (tg) tg.HapticFeedback.impactOccurred('light');
+      } else {
+        favorites.add(key);
+        if (tg) tg.HapticFeedback.notificationOccurred('success');
+      }
+      saveFavorites();
+      updateFavoriteIcons();
+      if (currentTab === 'favorites') applyFilters();
+    }
+    window.toggleFavorite = toggleFavorite;
+
+    function updateFavoriteIcons() {
+      document.querySelectorAll('.pokemon-card').forEach((card) => {
+        const id = card.getAttribute('data-id');
+        const fav = card.querySelector('.favorite-toggle');
+        if (!fav || !id) return;
+        if (isFavorite(id)) {
+          fav.classList.add('active');
+          fav.textContent = '★';
+        } else {
+          fav.classList.remove('active');
+          fav.textContent = '☆';
+        }
+      });
+    }
+
+    async function loadAllPokemon() {
+      try {
+        const res = await fetch(\`\${POKEMON_API}/pokemon?limit=1328\`);
+        const data = await res.json();
+        allPokemon = data.results;
+        filteredPokemon = [...allPokemon];
+        totalCountEl.textContent = \`Toplam \${data.count} Pokémon\`;
+        sortCurrent();
+        renderList(filteredPokemon, true);
+        if (tg) tg.HapticFeedback.impactOccurred('medium');
+      } catch (e) {
+        console.error(e);
+        listEl.innerHTML =
+          '<div class="no-results">Yüklenemedi. Yeniden dene.</div>';
+      }
+    }
+
+    function buildCard(p) {
+      const id = getIdFromUrl(p.url);
+      const card = document.createElement('div');
+      card.className = 'pokemon-card';
+      card.dataset.id = id;
+      card.onclick = () => showDetail(p.name);
+
+      card.innerHTML = `
+        <div class="sprite-wrap">
+          <img
+            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png"
+            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png'"
+            alt="${p.name}"
+          />
+        </div>
+        <div class="info-block">
+          <div class="info-top">
+            <div class="pokemon-id">#${id.toString().padStart(3, '0')}</div>
+            <div class="pokemon-name">${capitalize(p.name)}</div>
+          </div>
+          <div class="quick-stats" id="quick-${id}">Yükleniyor...</div>
+          <div class="pokemon-types" id="types-${id}"></div>
+        </div>
+        <div class="favorite-toggle ${
+          isFavorite(id) ? 'active' : ''
+        }" onclick="toggleFavorite('${id}', event)">
+          ${isFavorite(id) ? '★' : '☆'}
+        </div>
+      `;
+
+      loadMiniData(p.name, id);
+      return card;
+    }
+
+    async function loadMiniData(name, id) {
+      const pokemon = await fetchPokemon(name);
+      const typesEl = document.getElementById(`types-${id}`);
+      const quickEl = document.getElementById(`quick-${id}`);
+      if (!pokemon) {
+        if (quickEl) quickEl.textContent = '';
+        return;
+      }
+
+      if (typesEl) {
+        typesEl.innerHTML = pokemon.types
+          .map(
+            (t) => `
+          <span class="type-badge"
+                style="background:hsl(${getTypeColor(
+                  t.type.name
+                )},70%,45%);">
+            ${capitalize(t.type.name)}
+          </span>`
+          )
+          .join('');
+      }
+
+      if (quickEl) {
+        const hp =
+          pokemon.stats.find((s) => s.stat.name === 'hp')?.base_stat ?? '?';
+        const spd =
+          pokemon.stats.find((s) => s.stat.name === 'speed')?.base_stat ??
+          '?';
+        quickEl.textContent = `HP ${hp} · Hız ${spd}`;
+      }
+    }
+
+    function renderList(pokemons, reset = true) {
+      if (reset) {
+        listEl.innerHTML = '';
+        currentRendered = 0;
+      }
+      if (!pokemons.length) {
+        listEl.innerHTML =
+          '<div class="no-results">Sonuç yok.</div>';
+        return;
+      }
+      appendChunk(pokemons);
+    }
+
+    function appendChunk(pokemons) {
+      if (isAppending) return;
+      if (currentRendered >= pokemons.length) return;
+      isAppending = true;
+
+      const fragment = document.createDocumentFragment();
+      const slice = pokemons.slice(
+        currentRendered,
+        currentRendered + CHUNK_SIZE
+      );
+      slice.forEach((p) => fragment.appendChild(buildCard(p)));
+
+      listEl.appendChild(fragment);
+      currentRendered += slice.length;
+      isAppending = false;
+    }
+
+    listEl.addEventListener('scroll', () => {
+      if (
+        listEl.scrollTop + listEl.clientHeight >=
+        listEl.scrollHeight - 120
+      ) {
+        appendChunk(filteredPokemon);
+      }
+    });
+
+    async function showDetail(name) {
+      if (tg) tg.HapticFeedback.impactOccurred('light');
+      const pokemon = await fetchPokemon(name);
+      if (!pokemon) return;
+
+      const id = pokemon.id;
+
+      detailSprite.innerHTML = `
+        <img src="${
+          pokemon.sprites.other?.['official-artwork']?.front_default ||
+          pokemon.sprites.other?.home?.front_default ||
+          pokemon.sprites.front_default ||
+          ''
+        }" alt="${name}" />
+      `;
+
+      detailId.textContent = `#${String(id).padStart(3, '0')}`;
+      detailName.textContent = capitalize(name);
+
+      detailTypes.innerHTML = pokemon.types
+        .map(
+          (t) => `
+        <span class="type-badge"
+              style="background:hsl(${getTypeColor(
+                t.type.name
+              )},70%,45%);">
+          ${capitalize(t.type.name)}
+        </span>`
+        )
+        .join('');
+
+      const statsLines = pokemon.stats.map(
+        (stat) =>
+          `${getStatName(stat.stat.name)}: ${stat.base_stat}`
+      );
+
+      const weaknesses = calculateWeaknesses(
+        pokemon.types.map((t) => t.type.name)
+      );
+
+      const weakLine = weaknesses.length
+        ? `Zayıflıklar: ${weaknesses
+            .map((w) => capitalize(w))
+            .join(', ')}`
+        : 'Belirgin zayıflık yok.';
+
+      detailStats.innerHTML = `
+        ${statsLines.join(' · ')}<br />
+        <span style="color: var(--accent-yellow)">${weakLine}</span>
+      `;
+    }
+
+    function sortCurrent() {
+      const val = sortSelect.value;
+      filteredPokemon.sort((a, b) => {
+        const idA = Number(getIdFromUrl(a.url));
+        const idB = Number(getIdFromUrl(b.url));
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        if (val === 'id-asc') return idA - idB;
+        if (val === 'id-desc') return idB - idA;
+        if (val === 'name-asc') return nameA.localeCompare(nameB);
+        return idA - idB;
+      });
+    }
+
+    async function applyFilters() {
+      if (!allPokemon.length) return;
+      let list = [...allPokemon];
+
+      // tab
+      if (currentTab === 'favorites') {
+        list = list.filter((p) =>
+          favorites.has(getIdFromUrl(p.url))
+        );
+      }
+
+      // filter buttons
+      const activeFilter =
+        document.querySelector('.filter-btn.active')
+          ?.dataset.filter || 'all';
+
+      if (activeFilter.startsWith('generation-')) {
+        const ranges = {
+          'generation-1': [1, 151],
+          'generation-2': [152, 251],
+          'generation-3': [252, 386]
+        };
+        const [min, max] =
+          ranges[activeFilter] || [1, 1328];
+        list = list.filter((p) => {
+          const id = Number(getIdFromUrl(p.url));
+          return id >= min && id <= max;
+        });
+      } else if (activeFilter === 'legendary') {
+        if (!legendarySet) {
+          try {
+            const res = await fetch(
+              \`\${POKEMON_API}/pokemon-species?limit=2000\`
+            );
+            const data = await res.json();
+            const detailed = await Promise.all(
+              data.results.map((r) =>
+                fetch(r.url)
+                  .then((x) => x.json())
+                  .catch(() => null)
+              )
+            );
+            legendarySet = new Set(
+              detailed
+                .filter(
+                  (s) =>
+                    s &&
+                    (s.is_legendary || s.is_mythical)
+                )
+                .map((s) => s.name)
+            );
+          } catch (e) {
+            console.error('Legendary fetch error', e);
+            legendarySet = new Set();
+          }
+        }
+        list = list.filter((p) =>
+          legendarySet.has(p.name)
+        );
+      } else if (activeFilter === 'starter') {
+        list = list.filter((p) =>
+          startersSet.has(p.name)
+        );
+      }
+
+      // search
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) {
+        list = list.filter((p) => {
+          const name = p.name.toLowerCase();
+          const id = getIdFromUrl(p.url);
+          return (
+            name.includes(q) ||
+            id.startsWith(q.replace('#', ''))
+          );
+        });
+      }
+
+      filteredPokemon = list;
+      sortCurrent();
+      renderList(filteredPokemon, true);
+      updateFavoriteIcons();
+    }
+
+    // events
+
+    searchInput.addEventListener(
+      'input',
+      debounce(() => {
+        const v = searchInput.value.trim();
+        clearSearchBtn.style.display = v
+          ? 'flex'
+          : 'none';
+        applyFilters();
+      }, 220)
+    );
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearSearchBtn.style.display = 'none';
+      applyFilters();
+    });
+
+    filtersEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document
+        .querySelectorAll('.filter-btn')
+        .forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    });
+
+    sortSelect.addEventListener('change', () => {
+      sortCurrent();
+      renderList(filteredPokemon, true);
+      updateFavoriteIcons();
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) =>
+          t.classList.remove('active')
+        );
+        tab.classList.add('active');
+        currentTab = tab.dataset.tab;
+        applyFilters();
+      });
+    });
+
+    randomBtn.addEventListener('click', () => {
+      if (!allPokemon.length) return;
+      const pool =
+        currentTab === 'favorites'
+          ? allPokemon.filter((p) =>
+              favorites.has(getIdFromUrl(p.url))
+            )
+          : allPokemon;
+      if (!pool.length) return;
+      const random =
+        pool[Math.floor(Math.random() * pool.length)];
+      showDetail(random.name);
+    });
+
+    // start
+    loadAllPokemon();
+  });
 </script>
 </body>
 </html>
